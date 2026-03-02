@@ -5,7 +5,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (npm_config_platform=all fixes optional deps for Docker/ARM64)
+ENV npm_config_platform=all
 RUN npm install
 
 # Copy the rest of the application
