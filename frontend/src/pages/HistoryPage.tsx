@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  getExpenses,
-  createExpense,
-  createCategory,
-  fetchCategories,
-} from "../services/api";
-import { CategoryFormData, Expense, ExpenseFormData } from "../types";
+import { getExpenses, createExpense, createCategory } from "../services/api";
+import { Category, CategoryFormData, Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
@@ -95,7 +90,6 @@ const HistoryPage: React.FC = () => {
     try {
       await createCategory(data);
       setIsModalOpen(false);
-      fetchCategories();
     } catch (error) {
       console.error("Error creating category:", error);
       throw error;
@@ -111,21 +105,24 @@ const HistoryPage: React.FC = () => {
   const categoryData = expenses.reduce(
     (acc, expense) => {
       const category = expense.category || "Uncategorized";
-      if (!acc[category]) {
-        acc[category] = { category, amount: 0, count: 0 };
+      if (!acc[category.name]) {
+        acc[category.name] = { category, amount: 0, count: 0 };
       }
-      acc[category].amount += Number(expense.amount);
-      acc[category].count += 1;
+      acc[category.name].amount += Number(expense.amount);
+      acc[category.name].count += 1;
       return acc;
     },
-    {} as Record<string, { category: string; amount: number; count: number }>,
+    {} as Record<string, { category: Category; amount: number; count: number }>,
   );
 
-  const categories = Object.values(categoryData).sort(
+  const categoriesBreakdown = Object.values(categoryData).sort(
     (a, b) => b.amount - a.amount,
   );
-  const total = categories.reduce((sum, cat) => sum + cat.amount, 0);
-  const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
+  const total = categoriesBreakdown.reduce((sum, cat) => sum + cat.amount, 0);
+  const totalCount = categoriesBreakdown.reduce(
+    (sum, cat) => sum + cat.count,
+    0,
+  );
 
   const pageStyle: React.CSSProperties = {
     padding: "48px 64px",
@@ -206,7 +203,7 @@ const HistoryPage: React.FC = () => {
         ) : (
           <>
             <CategoryBreakdown
-              categories={categories}
+              categoriesBreakdown={categoriesBreakdown}
               total={total}
               totalCount={totalCount}
             />

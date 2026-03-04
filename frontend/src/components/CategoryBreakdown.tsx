@@ -1,21 +1,22 @@
 import React from "react";
 import { CATEGORY_EMOJIS } from "../constants/categoryEmojis";
 import { COLORS } from "../constants/colors";
+import { Category } from "../types";
 
 interface CategoryData {
-  category: string;
+  category: Category;
   amount: number;
   count: number;
 }
 
 interface CategoryBreakdownProps {
-  categories: CategoryData[];
+  categoriesBreakdown: CategoryData[];
   total: number;
   totalCount: number;
 }
 
 const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
-  categories,
+  categoriesBreakdown,
   total,
   totalCount,
 }) => {
@@ -182,9 +183,9 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
 
       {!isCollapsed && (
         <div style={listStyle}>
-          {categories.map((category) => (
+          {categoriesBreakdown.map((categoryBreakdown) => (
             <div
-              key={category.category}
+              key={categoryBreakdown.category.id}
               style={itemStyle}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = COLORS.secondary.s02;
@@ -200,17 +201,21 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
             >
               <div style={itemInfoStyle}>
                 <span style={itemIconStyle}>
-                  {CATEGORY_EMOJIS[category.category] || "📊"}
+                  {CATEGORY_EMOJIS[categoryBreakdown.category.name] || "📊"}
                 </span>
                 <div style={itemDetailsStyle}>
-                  <div style={itemNameStyle}>{category.category}</div>
+                  <div style={itemNameStyle}>
+                    {categoryBreakdown.category.name}
+                  </div>
                   <div style={itemCountStyle}>
-                    {category.count} transaction
-                    {category.count !== 1 ? "s" : ""}
+                    {categoryBreakdown.count} transaction
+                    {categoryBreakdown.count !== 1 ? "s" : ""}
                   </div>
                 </div>
               </div>
-              <div style={itemAmountStyle}>{formatAmount(category.amount)}</div>
+              <div style={itemAmountStyle}>
+                {formatAmount(categoryBreakdown.amount)}
+              </div>
             </div>
           ))}
         </div>
