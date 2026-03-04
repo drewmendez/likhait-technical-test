@@ -27,7 +27,7 @@ export function ExpenseForm({
       onSubmit,
     });
 
-  const { categories } = useFetchCategories();
+  const { categories, isCategoriesLoading } = useFetchCategories();
 
   const categoryOptions = categories.map((category) => ({
     value: category.id,
@@ -75,6 +75,7 @@ export function ExpenseForm({
         value={formData.category_id ?? undefined}
         onChange={(e) => handleChange("category_id", e.target.value)}
         error={errors.category_id}
+        isItemsLoading={isCategoriesLoading}
         fullWidth
       />
 
