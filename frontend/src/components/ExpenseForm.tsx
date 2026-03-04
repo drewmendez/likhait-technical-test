@@ -47,7 +47,7 @@ export function ExpenseForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} style={formStyle}>
+    <form onSubmit={handleSubmit} style={formStyle} noValidate>
       <TextField
         label="Amount"
         type="number"
@@ -57,6 +57,7 @@ export function ExpenseForm({
         onChange={(e) => handleChange("amount", e.target.value)}
         error={errors.amount}
         fullWidth
+        required
       />
 
       <TextField
@@ -67,6 +68,7 @@ export function ExpenseForm({
         onChange={(e) => handleChange("description", e.target.value)}
         error={errors.description}
         fullWidth
+        required
       />
 
       <SelectBox
@@ -77,6 +79,7 @@ export function ExpenseForm({
         error={errors.category_id}
         isItemsLoading={isCategoriesLoading}
         fullWidth
+        required
       />
 
       <TextField
@@ -86,6 +89,7 @@ export function ExpenseForm({
         onChange={(e) => handleChange("date", e.target.value)}
         error={errors.date}
         fullWidth
+        required
       />
 
       <div style={buttonGroupStyle}>

@@ -34,7 +34,7 @@ export function CategoryForm({
   };
 
   return (
-    <form style={formStyle} onSubmit={handleSubmit}>
+    <form style={formStyle} onSubmit={handleSubmit} noValidate>
       <TextField
         label="Name"
         type="text"
@@ -43,6 +43,7 @@ export function CategoryForm({
         error={errors.name}
         onChange={(e) => handleChange("name", e.target.value)}
         fullWidth
+        required
       />
 
       <div style={buttonGroupStyle}>
