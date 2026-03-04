@@ -43,7 +43,6 @@ export function CategoryForm({
         error={errors.name}
         onChange={(e) => handleChange("name", e.target.value)}
         fullWidth
-        required
       />
 
       <div style={buttonGroupStyle}>
