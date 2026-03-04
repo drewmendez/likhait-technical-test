@@ -4,9 +4,9 @@
 
 import React from "react";
 import { ExpenseFormData } from "../types";
-import { EXPENSE_CATEGORIES } from "../constants/categories";
 import { TextField, SelectBox, Button } from "../vibes";
 import { useExpenseForm } from "../hooks/useExpenseForm";
+import { useFetchCategories } from "../hooks/useFetchCategories";
 
 interface ExpenseFormProps {
   initialData?: Partial<ExpenseFormData>;
@@ -27,6 +27,13 @@ export function ExpenseForm({
       onSubmit,
     });
 
+  const { categories } = useFetchCategories();
+
+  const categoryOptions = categories.map((category) => ({
+    value: category.id,
+    label: category.name,
+  }));
+
   const formStyle: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -39,11 +46,6 @@ export function ExpenseForm({
     marginTop: "0.5rem",
   };
 
-  const categoryOptions = EXPENSE_CATEGORIES.map((category) => ({
-    value: category,
-    label: category,
-  }));
-
   return (
     <form onSubmit={handleSubmit} style={formStyle}>
       <TextField
@@ -55,7 +57,6 @@ export function ExpenseForm({
         onChange={(e) => handleChange("amount", e.target.value)}
         error={errors.amount}
         fullWidth
-        required
       />
 
       <TextField
@@ -66,17 +67,15 @@ export function ExpenseForm({
         onChange={(e) => handleChange("description", e.target.value)}
         error={errors.description}
         fullWidth
-        required
       />
 
       <SelectBox
         label="Category"
         options={categoryOptions}
-        value={formData.category}
-        onChange={(e) => handleChange("category", e.target.value)}
-        error={errors.category}
+        value={formData.category_id ?? undefined}
+        onChange={(e) => handleChange("category_id", e.target.value)}
+        error={errors.category_id}
         fullWidth
-        required
       />
 
       <TextField
@@ -86,7 +85,6 @@ export function ExpenseForm({
         onChange={(e) => handleChange("date", e.target.value)}
         error={errors.date}
         fullWidth
-        required
       />
 
       <div style={buttonGroupStyle}>
