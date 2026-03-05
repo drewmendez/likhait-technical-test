@@ -21,5 +21,19 @@ RSpec.describe "Api::Categories", type: :request do
       json = JSON.parse(response.body)
       expect(json.map { |c| c["name"] }).to eq([ "Food", "Supplies", "Transport" ])
     end
+
+    it "should error when name is empty or whitespace" do
+      post "/api/categories", params: { category: { name: " " } }, as: :json
+      expect(response).to have_http_status(:unprocessable_entity)
+      json = JSON.parse(response.body)
+      expect(json["errors"]).to include("Name is invalid")
+    end
+
+    it "should error when name is already taken" do
+      post "/api/categories", params: { category: { name: "Food" } }, as: :json
+      expect(response).to have_http_status(:unprocessable_entity)
+      json = JSON.parse(response.body)
+      expect(json["errors"]).to include("Name has already been taken")
+    end
   end
 end
