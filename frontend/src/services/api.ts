@@ -120,7 +120,9 @@ export async function createCategory(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create expense");
+    const errBody = await response.json().catch(() => null);
+    const message = errBody?.errors?.[0] ?? "Failed to create category";
+    throw new Error(message);
   }
 
   return response.json();

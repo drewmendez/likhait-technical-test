@@ -18,10 +18,10 @@ export function useCategoryForm({ onSubmit }: UseCategoryFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field: keyof CategoryFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value })); // Spread previous data in case we add more fields later (eg. description, etc.)
     // Clear error for this field when user starts typing
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined })); // Spread previous errors in case we add more fields later (eg. description, etc.)
     }
   };
 
@@ -50,7 +50,8 @@ export function useCategoryForm({ onSubmit }: UseCategoryFormProps) {
       setFormData({ name: "" });
       setErrors({});
     } catch (error) {
-      console.error("Form submission error:", error);
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setErrors((prev) => ({ ...prev, name: message })); // Spread previous errors in case we add more fields later (eg. description, etc.)
     } finally {
       setIsSubmitting(false);
     }
