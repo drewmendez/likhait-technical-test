@@ -9,7 +9,8 @@ interface SelectBoxProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   fullWidth?: boolean;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string | number; label: string }>;
+  isItemsLoading?: boolean;
 }
 
 export function SelectBox({
@@ -17,6 +18,7 @@ export function SelectBox({
   error,
   fullWidth = false,
   options,
+  isItemsLoading = false,
   ...props
 }: SelectBoxProps) {
   const containerStyle: React.CSSProperties = {
@@ -41,7 +43,7 @@ export function SelectBox({
     transition: "border-color 0.2s",
     backgroundColor: COLORS.background.main,
     color: COLORS.text.primary,
-    cursor: "pointer",
+    cursor: isItemsLoading ? "not-allowed" : "pointer",
   };
 
   const errorStyle: React.CSSProperties = {
@@ -53,8 +55,10 @@ export function SelectBox({
   return (
     <div style={containerStyle}>
       {label && <label style={labelStyle}>{label}</label>}
-      <select style={selectStyle} {...props}>
-        <option value="">Select...</option>
+      <select style={selectStyle} disabled={isItemsLoading} {...props}>
+        <option value="">
+          {isItemsLoading ? "Items are loading..." : "Select..."}
+        </option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense } from "../services/api";
-import { Expense, ExpenseFormData } from "../types";
+import { getExpenses, createExpense, createCategory } from "../services/api";
+import { Category, CategoryFormData, Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
 import { CalendarExpenseTable } from "../components/CalendarExpenseTable";
 import { ExpenseForm } from "../components/ExpenseForm";
+import { CategoryForm } from "../components/CategoryForm";
 import { Modal, Button } from "../vibes";
 import { COLORS } from "../constants/colors";
 
@@ -13,6 +14,9 @@ const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [action, setAction] = useState<"add-expense" | "add-category">(
+    "add-expense",
+  );
 
   // Get year and month from URL params, default to current date if not provided
   const getInitialYearMonth = () => {
@@ -82,25 +86,43 @@ const HistoryPage: React.FC = () => {
     }
   };
 
+  const handleAddCategory = async (data: CategoryFormData) => {
+    try {
+      await createCategory(data);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      throw error;
+    }
+  };
+
+  const handleActionClick = (action: "add-expense" | "add-category") => {
+    setAction(action);
+    setIsModalOpen(true);
+  };
+
   // Calculate category breakdown
   const categoryData = expenses.reduce(
     (acc, expense) => {
       const category = expense.category || "Uncategorized";
-      if (!acc[category]) {
-        acc[category] = { category, amount: 0, count: 0 };
+      if (!acc[category.name]) {
+        acc[category.name] = { category, amount: 0, count: 0 };
       }
-      acc[category].amount += Number(expense.amount);
-      acc[category].count += 1;
+      acc[category.name].amount += Number(expense.amount);
+      acc[category.name].count += 1;
       return acc;
     },
-    {} as Record<string, { category: string; amount: number; count: number }>,
+    {} as Record<string, { category: Category; amount: number; count: number }>,
   );
 
-  const categories = Object.values(categoryData).sort(
+  const categoriesBreakdown = Object.values(categoryData).sort(
     (a, b) => b.amount - a.amount,
   );
-  const total = categories.reduce((sum, cat) => sum + cat.amount, 0);
-  const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
+  const total = categoriesBreakdown.reduce((sum, cat) => sum + cat.amount, 0);
+  const totalCount = categoriesBreakdown.reduce(
+    (sum, cat) => sum + cat.count,
+    0,
+  );
 
   const pageStyle: React.CSSProperties = {
     padding: "48px 64px",
@@ -138,6 +160,11 @@ const HistoryPage: React.FC = () => {
     color: COLORS.secondary.s08,
   };
 
+  const buttonGroupStyle: React.CSSProperties = {
+    display: "flex",
+    gap: "16px",
+  };
+
   return (
     <div style={pageStyle}>
       <div style={headerStyle}>
@@ -148,9 +175,20 @@ const HistoryPage: React.FC = () => {
             onYearChange={handleYearChange}
           />
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-          Add Expense
-        </Button>
+        <div style={buttonGroupStyle}>
+          <Button
+            variant="secondary"
+            onClick={() => handleActionClick("add-category")}
+          >
+            Add Category
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => handleActionClick("add-expense")}
+          >
+            Add Expense
+          </Button>
+        </div>
       </div>
 
       <MonthNavigation
@@ -165,7 +203,7 @@ const HistoryPage: React.FC = () => {
         ) : (
           <>
             <CategoryBreakdown
-              categories={categories}
+              categoriesBreakdown={categoriesBreakdown}
               total={total}
               totalCount={totalCount}
             />
@@ -182,12 +220,21 @@ const HistoryPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add New Expense"
+        title={
+          action === "add-expense" ? "Add New Expense" : "Add New Category"
+        }
       >
-        <ExpenseForm
-          onSubmit={handleAddExpense}
-          onCancel={() => setIsModalOpen(false)}
-        />
+        {action === "add-expense" ? (
+          <ExpenseForm
+            onSubmit={handleAddExpense}
+            onCancel={() => setIsModalOpen(false)}
+          />
+        ) : (
+          <CategoryForm
+            onSubmit={handleAddCategory}
+            onCancel={() => setIsModalOpen(false)}
+          />
+        )}
       </Modal>
     </div>
   );

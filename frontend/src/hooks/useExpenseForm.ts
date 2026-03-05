@@ -15,11 +15,13 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
   const [formData, setFormData] = useState<ExpenseFormData>({
     amount: initialData?.amount || "",
     description: initialData?.description || "",
-    category: initialData?.category || "",
+    category_id: initialData?.category_id || null,
     date: initialData?.date || formatDate(new Date()),
   });
 
-  const [errors, setErrors] = useState<Partial<ExpenseFormData>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ExpenseFormData, string>>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field: keyof ExpenseFormData, value: string) => {
@@ -31,7 +33,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<ExpenseFormData> = {};
+    const newErrors: Partial<Record<keyof ExpenseFormData, string>> = {};
 
     if (!formData.amount || Number(formData.amount) <= 0) {
       newErrors.amount = "Amount must be greater than 0";
@@ -41,8 +43,8 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
       newErrors.description = "Description is required";
     }
 
-    if (!formData.category) {
-      newErrors.category = "Category is required";
+    if (!formData.category_id) {
+      newErrors.category_id = "Category is required";
     }
 
     if (!formData.date) {
@@ -67,7 +69,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
       setFormData({
         amount: "",
         description: "",
-        category: "",
+        category_id: null,
         date: formatDate(new Date()),
       });
       setErrors({});
@@ -82,7 +84,7 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
     setFormData({
       amount: initialData?.amount || "",
       description: initialData?.description || "",
-      category: initialData?.category || "",
+      category_id: initialData?.category_id || null,
       date: initialData?.date || formatDate(new Date()),
     });
     setErrors({});
